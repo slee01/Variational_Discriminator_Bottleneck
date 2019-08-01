@@ -6,7 +6,8 @@ import torch as th
 from torch.backends import cudnn
 
 # define the device for the training script
-device = th.device("cuda" if th.cuda.is_available() else "cpu")
+# device = th.device("cuda" if th.cuda.is_available() else "cpu")
+device = th.device("cpu")
 
 # enable fast training
 cudnn.benchmark = True

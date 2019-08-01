@@ -184,20 +184,39 @@ class Generator(nn.Module):
         :param z: input z (latent vector) => [Batchsize x latent_size]
         :return:
         """
+        # _z = z.detach().numpy()
+        # print("z shape: ", _z.shape)
 
         batch_size = z.size(0)
 
         # first layer (Fully Connected)
         out = self.fc(z)
+
+        # _out = out.detach().numpy()
+        # print("self.fc(z) shape: ", _out.shape)
+
         # Reshape output into volume
         out = out.view(batch_size, self.nf0, self.s0, self.s0)
+
+        # _out = out.detach().numpy()
+        # print("out.view(batch_size, self.nf0, self.s0, self.s0) shape: ", _out.shape)
 
         # apply the Resnet architecture
         out = self.resnet(out)
 
+        # _out = out.detach().numpy()
+        # print("self.resnet(out) shape: ", _out.shape)
+
         # apply the final image converter
         out = self.conv_img(actvn(out))
+
+        # _out = out.detach().numpy()
+        # print("self.conv_img(actvn(out)) shape: ", _out.shape)
+
         out = th.tanh(out)  # our pixel values are in range [-1, 1]
+
+        # _out = out.detach().numpy()
+        # print("th.tanh(out) shape: ", _out.shape)
 
         return out
 
@@ -269,18 +288,31 @@ class Discriminator(nn.Module):
         :param mean_mode: decides whether to sample points or use means directly
         :return: prediction scores (Linear), mus and sigmas: [Batch_size x 1]
         """
+        # _x = x.detach().numpy()
+        # print("x shape: ", x.shape)
 
         # convert image to initial volume
         out = self.conv_img(x)
 
+        # _out = out.detach().numpy()
+        # print("self.conv_img(x) shape: ", _out.shape)
+
         # apply the resnet module
         out = self.resnet(out)
+
+        # _out = out.detach().numpy()
+        # print("self.resnet(out) shape: ", _out.shape)
 
         # apply the converter
         parameters = self.conv_converter(actvn(out))
 
+        # _out = parameters.detach().numpy()
+        # print("self.conv_converter(actvn(out)) shape: ", _out.shape)
+
         # flatten the volume
         parameters = parameters.squeeze(-1).squeeze(-1)
+        # _out = parameters.detach().numpy()
+        # print("parameters.squeeze(-1).squeeze(-1) shape: ", _out.shape)
 
         # split the activations into means and standard deviations
         halfpoint = parameters.shape[-1] // 2
